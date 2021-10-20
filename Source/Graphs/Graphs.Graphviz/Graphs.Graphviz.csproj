@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <AssemblyName>Auxilia.Graphs.Graphviz</AssemblyName>
+    <RootNamespace>Auxilia.Graphs.Graphviz</RootNamespace>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\Bin\Debug</OutputPath>
+    <DocumentationFile>..\..\Bin\Debug\Auxilia.Graphs.Graphviz.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\Bin\Release</OutputPath>
+    <DocumentationFile>..\..\Bin\Release\Auxilia.Graphs.Graphviz.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
+    <ProjectReference Include="..\..\Common\Common.Utilities\Common.Utilities.csproj" />
+    <ProjectReference Include="..\Graphs.Core\Graphs.Core.csproj" />
+  </ItemGroup>
+
+</Project>
