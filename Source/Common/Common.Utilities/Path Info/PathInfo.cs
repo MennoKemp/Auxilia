@@ -115,30 +115,16 @@ namespace Auxilia.Utilities
                 System.IO.Directory.Delete(FullPath);
         }
 
-        public bool IsValid(bool isRelative = false)
+        public bool IsValid(bool includeRoot = true)
         {
             if (IsEmpty)
 		        return false;
-                //return Result.Failed("Path is null or empty.");
 
-            if (isRelative)
-            {
-	            if (FullPath.Contains(Path.VolumeSeparatorChar))
-		            return false;
-	            //return Result.Failed($"Path '{FullPath}' is not relative.");
-            }
-            else
-            {
-                string root = new string(FullPath.TakeWhile(c => !c.Equals(SeparatorChar)).ToArray());
+            if (FullPath.Any(InvalidPathCharacters.Contains))
+                return false;
 
-                if (!root.EndsWith(Path.VolumeSeparatorChar.ToString()))
-			        return false;
-                    //return Result.Failed($"Root of '{FullPath}' does not end with '{Path.VolumeSeparatorChar}'.");
-            }
-
-            return !FullPath.Any(InvalidPathCharacters.Contains);
-            //? Result.Failed($"Path '{FullPath}' contains illegal characters.")
-            //: Result.Successful($"Path '{FullPath}' is valid.");
+            return includeRoot && IsRooted ||
+                !includeRoot && !IsRooted;
         }
 
         public PathInfo ChangeExtension(string extension)

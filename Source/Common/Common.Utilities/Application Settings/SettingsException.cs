@@ -3,7 +3,7 @@
 namespace Auxilia.Utilities
 {
     /// <summary>
-    /// Exception thrown when a settings related error occurs.
+    /// Exception thrown when an error related to settings occurs.
     /// </summary>
     public class SettingsException : Exception
     {

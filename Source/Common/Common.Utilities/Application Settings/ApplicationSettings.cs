@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Auxilia.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,151 +8,152 @@ using System.Text;
 
 namespace Auxilia.Utilities
 {
-    /// <summary>
-    /// Base class for application settings.
-    /// </summary>
-    public abstract class ApplicationSettings
+	/// <summary>
+	/// Base class for application settings.
+	/// Handles retrieving and storing of settings.
+	/// </summary>
+	public abstract class ApplicationSettings
     {
-        ///// <summary>
-        ///// Initializes new instance of <see cref="ApplicationSettings"/>.
-        ///// </summary>
-        ///// <param name="settingsDirectory">Directory in which the settings are stored.</param>
-        //protected ApplicationSettings(string settingsDirectory)
-        //{
-        //    SettingsFolderName = settingsDirectory;
-        //}
-        ///// <summary>
-        ///// Initializes new instance of <see cref="ApplicationSettings"/>.
-        ///// </summary>
-        ///// <param name="settingsDirectory">CommandName of the folder in which the settings are stored.</param>
-        //protected ApplicationSettings(string settingsFolderName, bool use)
-        //{
-        //    SettingsFolderName = settingsDirectory;
-        //}
-        
         /// <summary>
-        /// Gets the type of settings directory.
+        /// Gets the settings directory type.
         /// </summary>
-        protected virtual SettingsDirectoryType SettingsDirectoryType { get; }
+        protected abstract SettingsDirectoryType SettingsDirectoryType { get; }
         /// <summary>
-        /// Gets or sets the custom settings directory.
+        /// Gets or sets the path for the settings file.
         /// Use an absolute path for <see cref="SettingsDirectoryType.Custom"/>
-        /// and a relative path for <see cref="SettingsDirectoryType.LocalApplicationData"/> or <see cref="SettingsDirectoryType.LocalApplicationData"/>.
+		/// and a relative path for the other types.
         /// </summary>
-        protected virtual string CustomSettingsDirectory { get; set; }
+        protected abstract string Path { get; set; }
         
         /// <summary>
         /// Gets the name of the application settings file.
-        /// </summary>
+		/// Default value: "AppSettings.txt".
+		/// </summary>
         protected virtual string FileName { get; } = "AppSettings.txt";
         /// <summary>
         /// Gets the encoding for the settings file.
+		/// Devault value: <see cref="Encoding.UTF8"/>.
         /// </summary>
         protected virtual Encoding Encoding { get; } = Encoding.UTF8;
 
-        ///// <summary>
-        ///// Gets the value for a specific setting.
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="currentSettings"></param>
-        ///// <param name="defaultValue"></param>
-        ///// <param name="settingName"></param>
-        ///// <returns></returns>
-        ///// <exception cref="ArgumentNullException">Thrown when <paramref name="currentSettings"/> is <see langword="null"/>.</exception>
-        ///// <exception cref="ArgumentException">Thrown when <paramref name="settingName"/> is <see langword="null"/> or empty.</exception>
-        //protected static T GetSetting<T>(ApplicationSettings currentSettings, T defaultValue = default, [CallerMemberName] string settingName = "")
-        //{
-        //    currentSettings.ThrowIfNull(nameof(currentSettings));
-        //    settingName.ThrowIfNullOrEmpty(nameof(settingName));
+		/// <summary>
+		/// Gets the value for the specified setting.
+		/// </summary>
+		/// <typeparam name="T">Setting type.</typeparam>
+		/// <param name="currentSettings">Instance of <see cref="ApplicationSettings"/>.</param>
+		/// <param name="defaultValue">Default value in case the setting does not exist.</param>
+		/// <param name="settingName">Name of the setting.</param>
+		/// <returns>The setting value or the default value if it does not exist.</returns>
+		/// <exception cref="ArgumentNullException">Thrown when <paramref name="currentSettings"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException">Thrown when <paramref name="settingName"/> is <see langword="null"/> or empty.</exception>
+		/// <exception cref="SettingsException">Thrown when retrieving of a setting failed.</exception>
+		protected static T GetSetting<T>(ApplicationSettings currentSettings, T defaultValue = default, [CallerMemberName] string settingName = "")
+		{
+			currentSettings.ThrowIfNull(nameof(currentSettings));
+			settingName.ThrowIfNullOrEmpty(nameof(settingName));
 
-        //    try
-        //    {
-        //        List<Setting> settings = currentSettings.GetSettings();
+			try
+			{
+				List<Setting> settings = currentSettings.GetSettings();
 
-        //        if (settings.SingleOrDefault(s => s.CommandName.Equals(settingName, StringComparison.OrdinalIgnoreCase)) is Setting setting)
-        //            return (T)Convert.ChangeType(setting.Value, typeof(T));
+				if (settings.SingleOrDefault(s => s.Name.Equals(settingName, StringComparison.OrdinalIgnoreCase)) is Setting setting)
+					return (T)Convert.ChangeType(setting.Value, typeof(T));
 
-        //        settings.Add(new Setting(settingName, defaultValue?.ToString() ?? string.Empty));
-        //        currentSettings.SaveSettings(settings);
-        //        return defaultValue;
-        //    }
-        //    catch(Exception exception)
-        //    {
-        //        throw new SettingsException($"An error occured while getting setting '{settingName}'.", exception);
-        //    }
-        //}
+				settings.Add(new Setting(settingName, defaultValue?.ToString() ?? string.Empty));
+				currentSettings.SaveSettings(settings);
+				return defaultValue;
+			}
+			catch (Exception exception)
+			{
+				throw new SettingsException($"An error occured while getting setting '{settingName}'.", exception);
+			}
+		}
 
-        //protected static void SetSetting<T>(ApplicationSettings currentSettings, T value, [CallerMemberName] string settingName = "")
-        //{
-        //    settingName.ThrowIfNullOrEmpty(nameof(settingName));
+		/// <summary>
+		/// Sets a value for the specified setting.
+		/// </summary>
+		/// <typeparam name="T">Setting type.</typeparam>
+		/// <param name="currentSettings">Instance of <see cref="ApplicationSettings"/></param>
+		/// <param name="value">Value to set.</param>
+		/// <param name="settingName">Name of the setting.</param>
+		/// <exception cref="ArgumentNullException">Thrown when <paramref name="currentSettings"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException">Thrown when <paramref name="settingName"/> is <see langword="null"/> or empty or contains "=" 
+		/// or when <see cref="Path"/> is invalid.</exception>
+		/// <exception cref="SettingsException">Thrown when storing of a setting failed.</exception>
+		protected static void SetSetting<T>(ApplicationSettings currentSettings, T value, [CallerMemberName] string settingName = "")
+		{
+			currentSettings.ThrowIfNull(nameof(currentSettings));
+			settingName.ThrowIfNullOrEmpty(nameof(settingName));
 
-        //    try
-        //    {
-        //        List<Setting> settings = currentSettings.GetSettings();
+			if (settingName.Contains('='))
+				throw new ArgumentException("Cannot contain \"=\".", nameof(settingName));
 
-        //        if (settings.SingleOrDefault(s => s.CommandName.Equals(settingName, StringComparison.OrdinalIgnoreCase)) is Setting setting)
-        //            setting.Value = value?.ToString() ?? string.Empty;
+			try
+			{
+				List<Setting> settings = currentSettings.GetSettings();
 
-        //        currentSettings.SaveSettings(settings);
-        //    }
-        //    catch(Exception exception)
-        //    {
-        //        throw new SettingsException($"An error occured while setting '{settingName}'.", exception);
-        //    }
-        //}
+				if (settings.SingleOrDefault(s => s.Name.Equals(settingName, StringComparison.OrdinalIgnoreCase)) is Setting setting)
+					setting.Value = $"{value}";
 
-        //private string GetSettingsPath()
-        //{
-        //    Root.ThrowIfNullOrEmpty(nameof(Root));
-        //    SettingsFolderName.ThrowIfNullOrEmpty(nameof(SettingsFolderName));
-        //    FileName.ThrowIfNullOrEmpty(nameof(FileName));
+				currentSettings.SaveSettings(settings);
+			}
+			catch (Exception exception)
+			{
+				throw new SettingsException($"An error occured while setting '{settingName}'.", exception);
+			}
+		}
 
-        //    PathInfo pathInfo = new PathInfo(Root, SettingsFolderName, FileName);
-            
-        //    if(!pathInfo.IsPathValid().IsSuccessful(out Result result))
-        //        throw new InvalidOperationException(result.Message);
+		private string GetSettingsPath()
+		{
+			Path.ThrowIfNullOrEmpty(nameof(Path));
 
-        //    return pathInfo.FullPath;
-        //}
+			PathInfo path = SettingsDirectoryType switch
+			{
+				SettingsDirectoryType.Custom => new PathInfo(Path),
+				SettingsDirectoryType.LocalApplicationData => new PathInfo(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Path),
+				SettingsDirectoryType.RoamingApplicationData => new PathInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Path),
+				_ => throw new EnumValueNotDefinedException<SettingsDirectoryType>(SettingsDirectoryType, nameof(SettingsDirectoryType))
+			};
 
-        //private void SaveSettings(IEnumerable<Setting> settings)
-        //{
-        //    try
-        //    {
-        //        File.WriteAllLines(GetSettingsPath(), settings.SelectStrings(), Encoding);
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        throw new SettingsException($"An error occurred while saving settings to '{GetSettingsPath()}'.", exception);
-        //    }
-        //}
+			if(path.IsValid(SettingsDirectoryType == SettingsDirectoryType.Custom))
+				throw new ArgumentException($"Path {path} is invalid.");
 
-        //private List<Setting> GetSettings()
-        //{
-        //    string settingsPath = GetSettingsPath();
+			return path.FullPath;
+		}
 
-        //    try
-        //    {
-        //        if (!File.Exists(settingsPath))
-        //        {
-        //            string settingsFolder = new PathInfo(settingsPath).Parent.FullPath;
+		private void SaveSettings(IEnumerable<Setting> settings)
+		{
+			try
+			{
+				PathInfo settingsPath = new PathInfo(GetSettingsPath());
+				settingsPath.Parent.Create();
 
-        //            if (!Directory.Exists(settingsFolder))
-        //                Directory.CreateDirectory(settingsFolder);
+				File.WriteAllLines(GetSettingsPath(), settings.SelectStrings(), Encoding);
+			}
+			catch (Exception exception)
+			{
+				throw new SettingsException($"An error occurred while saving settings to '{GetSettingsPath()}'.", exception);
+			}
+		}
 
-        //            File.Create(settingsPath).Dispose();
-        //        }
+		private List<Setting> GetSettings()
+		{
+			string settingsPath = GetSettingsPath();
 
-        //        return File.ReadAllLines(settingsPath)
-        //            .Select(l => l.Split('='))
-        //            .Where(l => l.Length == 2)
-        //            .Select(l => new Setting(l[0], l[1]))
-        //            .ToList();
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        throw new SettingsException($"An error occurred while getting settings from '{GetSettingsPath()}'.", exception);
-        //    }
-        //}
-    }
+			try
+			{
+				return File.Exists(settingsPath)
+					? File.ReadAllLines(settingsPath)
+					.Select(l => l.Split('='))
+					.Where(l => l.Length == 2)
+					.Select(l => new Setting(l[0], l[1]))
+					.ToList()
+					: new List<Setting>();
+			}
+			catch (Exception exception)
+			{
+				throw new SettingsException($"An error occurred while getting settings from '{settingsPath}'.", exception);
+			}
+		}
+	}
 }

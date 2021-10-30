@@ -17,10 +17,6 @@
             set => _value = value ?? string.Empty;
         }
 
-        /// <summary>
-        /// Returns object string.
-        /// </summary>
-        /// <returns>Object string.</returns>
         public override string ToString()
         {
             return $"{Name}={Value}";
