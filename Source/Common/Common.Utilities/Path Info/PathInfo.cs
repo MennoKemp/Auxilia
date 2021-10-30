@@ -15,8 +15,6 @@ namespace Auxilia.Utilities
         {
             FullPath = fullPath?.Replace(Path.AltDirectorySeparatorChar, SeparatorChar)
                 .Replace($"{SeparatorChar}{SeparatorChar}", $"{SeparatorChar}");
-
-            Chain = Split(FullPath);
         }
         public PathInfo(params string[] chain)
             : this(Combine(chain))
@@ -27,8 +25,11 @@ namespace Auxilia.Utilities
         {
         }
 
-        public string FullPath { get; }
-        public string[] Chain { get; }
+        public string FullPath { get; private set; }
+        public string[] Chain
+		{
+            get => Split(FullPath);
+		}
         public string Name
         {
             get => Chain.Last();
@@ -39,9 +40,7 @@ namespace Auxilia.Utilities
         }
         public string Extension
         {
-            get => IsFile
-                ? Path.GetExtension(FullPath)
-                : string.Empty;
+            get => Path.GetExtension(FullPath);
         }
         public string Directory
         {
@@ -57,6 +56,10 @@ namespace Auxilia.Utilities
                 ? null
                 : new PathInfo(Chain.Take(Chain.Length - 1));
         }
+        public bool IsRooted
+		{
+            get => Path.IsPathRooted(FullPath);
+		}
 
         public bool IsEmpty
         {
@@ -137,6 +140,16 @@ namespace Auxilia.Utilities
             //? Result.Failed($"Path '{FullPath}' contains illegal characters.")
             //: Result.Successful($"Path '{FullPath}' is valid.");
         }
+
+        public PathInfo ChangeExtension(string extension)
+		{
+            if(!Chain.Any() || IsRooted && Chain.Length == 1)
+                throw new InvalidOperationException($"Cannot change path of \"{FullPath}\".");
+
+            FullPath = Path.ChangeExtension(FullPath, extension);
+            
+            return this;
+		}
 
         public override string ToString()
         {
