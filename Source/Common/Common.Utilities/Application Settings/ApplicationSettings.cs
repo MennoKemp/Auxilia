@@ -19,11 +19,11 @@ namespace Auxilia.Utilities
         /// </summary>
         protected abstract SettingsDirectoryType SettingsDirectoryType { get; }
         /// <summary>
-        /// Gets or sets the path for the settings file.
+        /// Gets the path for the settings file.
         /// Use an absolute path for <see cref="SettingsDirectoryType.Custom"/>
 		/// and a relative path for the other types.
         /// </summary>
-        protected abstract string Path { get; set; }
+        protected abstract string Path { get; }
         
         /// <summary>
         /// Gets the name of the application settings file.
