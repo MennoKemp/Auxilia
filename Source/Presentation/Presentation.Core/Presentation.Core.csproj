@@ -1,31 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-	<TargetFramework>net5.0-windows</TargetFramework>
-	<RootNamespace>Auxilia.Presentation</RootNamespace>
-	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<AssemblyName>Auxilia.Presentation.Core</AssemblyName>
-	<UseWPF>true</UseWPF>
+		<TargetFramework>net5.0-windows</TargetFramework>
+		<RootNamespace>Auxilia.Presentation</RootNamespace>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AssemblyName>Auxilia.Presentation.Core</AssemblyName>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\..\Bin\Debug</OutputPath>
-    <DocumentationFile>..\..\Bin\Debug\Auxilia.Presentation.Core.xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>..\..\Bin\Debug</OutputPath>
+		<DocumentationFile>..\..\Bin\Debug\Auxilia.Presentation.Core.xml</DocumentationFile>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\..\Bin\Release</OutputPath>
-    <DocumentationFile>..\..\Bin\Release\Auxilia.Presentation.Core.xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\..\Bin\Release</OutputPath>
+		<DocumentationFile>..\..\Bin\Release\Auxilia.Presentation.Core.xml</DocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
-    <ProjectReference Include="..\..\Common\Common.Data\Common.Data.csproj" />
-    <ProjectReference Include="..\..\Common\Common.Delegation\Common.Delegation.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
+		<ProjectReference Include="..\..\Common\Common.Data\Common.Data.csproj" />
+		<ProjectReference Include="..\..\Common\Common.Delegation\Common.Delegation.csproj" />
+	</ItemGroup>
 
 </Project>

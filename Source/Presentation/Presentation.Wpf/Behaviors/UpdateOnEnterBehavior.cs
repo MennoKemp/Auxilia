@@ -1,9 +1,9 @@
-﻿using System.Windows.Controls;
+﻿using Microsoft.Xaml.Behaviors;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interactivity;
 
-namespace Auxilia.Presentation.Behaviors
+namespace Auxilia.Presentation.Wpf.Behaviors
 {
 	public class UpdateOnEnterBehavior : Behavior<TextBox>
 	{

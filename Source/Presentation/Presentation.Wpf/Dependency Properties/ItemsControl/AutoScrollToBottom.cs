@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Auxilia.Presentation.Controls
+namespace Auxilia.Presentation.Wpf.Properties
 {
 	public static class ItemsControlProperties
 	{

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0-windows</TargetFramework>
+		<RootNamespace>Auxilia.Presentation.Wpf</RootNamespace>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AssemblyName>Auxilia.Presentation.Wpf</AssemblyName>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Common\Common.Extensions\Common.Extensions.csproj" />
+	</ItemGroup>
+
+</Project>
