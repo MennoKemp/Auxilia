@@ -14,6 +14,8 @@ namespace Auxilia.Utilities
 	/// </summary>
 	public abstract class ApplicationSettings
     {
+		private static readonly object ReadWriteLock = new object();
+
         /// <summary>
         /// Gets the settings directory type.
         /// </summary>
@@ -126,9 +128,12 @@ namespace Auxilia.Utilities
 			try
 			{
 				PathInfo settingsPath = new PathInfo(GetSettingsPath());
-				settingsPath.Parent.Create();
 
-				File.WriteAllLines(GetSettingsPath(), settings.SelectStrings(), Encoding);
+				lock(ReadWriteLock)
+				{
+					settingsPath.Parent.Create();
+					File.WriteAllLines(GetSettingsPath(), settings.SelectStrings(), Encoding);
+				}
 			}
 			catch (Exception exception)
 			{
@@ -142,13 +147,16 @@ namespace Auxilia.Utilities
 
 			try
 			{
-				return File.Exists(settingsPath)
-					? File.ReadAllLines(settingsPath)
-					.Select(l => l.Split('='))
-					.Where(l => l.Length == 2)
-					.Select(l => new Setting(l[0], l[1]))
-					.ToList()
-					: new List<Setting>();
+				lock(ReadWriteLock)
+				{
+					return File.Exists(settingsPath)
+						? File.ReadAllLines(settingsPath)
+						.Select(l => l.Split('='))
+						.Where(l => l.Length == 2)
+						.Select(l => new Setting(l[0], l[1]))
+						.ToList()
+						: new List<Setting>();
+				}
 			}
 			catch (Exception exception)
 			{
